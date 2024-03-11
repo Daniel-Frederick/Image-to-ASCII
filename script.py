@@ -1,27 +1,26 @@
-# Used this website to help create and understand PIL.Image library 
-# https://pillow.readthedocs.io/en/stable/reference/Image.html
 import PIL.Image
 
 # ascii characters used to build the output text
-ASCII_CHARS = ["@", "#", "S", "%", "?", "*", "+", ";", ":", "," ] # This includes charcter in descending order of brightness intensity
+ASCII_CHARS = ["@", "#", "S", "%", "?", "*", "+", ";", ":", "," ] # This includes characters in descending order of brightness intensity
 # Each pixel will get associated with one of these characters
 
 # 1. Resize image according to a new width
 def resize_image(image, new_width=100):
     width, height = image.size # Gets the width and height of the image
-    ratio = height / width / 1.65 # Calculate a ratio to help in correctly resizing the image
-    new_height = int(new_width * ratio) # Calculate the new height of the image
+    new_height = int(height * (new_width / width / 2)) # Scale the height down to keep the same aspect ratio
     resized_image = image.resize((new_width, new_height)) # Pass a tuple that represents the new image size
+    print("new width: ", new_width)
+    print("new height: ", new_height)
     return(resized_image) # Get the newly resized image
-
+    
 # 2. Convert the image to grayscale
 def grayscale_image(image):
-    grayscale_image = image.convert("L") # Removes color information from the image to vonert to grayscale
-    return(grayscale_image) # Return the new image
+    grayscale_image = image.convert("L") # Removes color information from the image to convert to grayscale
+    return grayscale_image # Return the new image
 
 # 3. Convert pixels to a String of ASCII Characters
 def asciiConverter(image):
-    pixels = image.getdata() # Returns a list of each pixels grayscale value
+    pixels = image.getdata() # Returns a list of each pixel's grayscale value
     # Determine the scaling factor to fit the grayscale values within the range of ASCII_CHARS
     scaling_factor = 255 / (len(ASCII_CHARS) - 1)
     # Map the grayscale values to ASCII characters, by iterating through each pixel and assign it an ASCII character
@@ -37,26 +36,25 @@ def main(new_width=100):
     pathname = pathname[:-4] # Remove .xxx from the end of the filename
     # print(pathname)
 
-    # Error handling to make sure that the the filename is correct
+    # Error handling to make sure that the filename is correct
     try:
         # If the image is correct then get that image
         image = PIL.Image.open(path)
         print(image, "  is a good image")
 
-        resize_image = resize_image(image)
-        print("resize works")
+        # 1. Resize image
+        resized_image = resize_image(image)
+        # print("resize works")
 
-        gray = grayscale_image(resize_image)
-        print("grayify works")
+        # 2. Image to grayscale
+        gray = grayscale_image(resized_image)
+        # print("grayify works")
         
-        # convert image to ascii    
+        # 3. Pixels to ASCII
+        # convert image to ascii
         new_image_data = asciiConverter(gray)
-        print("asciiConverter  works")
+        # print("asciiConverter  works")
 
-        # # Resize the image, convert to grayscale, then convert to ASCII
-        # new_image = asciiConverter(grayscale_image(resize_image(image)))
-        # print(new_image, "  is a good image")
-        
         # Image not yet formatted in aspect ratio
         # Formatting the ASCII characters
         pixel_count = len(new_image_data) # Get image length
